@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="es" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clase de Orientación: SIMCE II° E</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: {
+                            950: '#020617',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .tab-content { display: none; opacity: 0; transition: opacity 0.35s ease, transform 0.35s ease; transform: translateY(16px); }
+        .tab-content.active { display: block; opacity: 1; transform: translateY(0); }
+        
+        /* Animaciones personalizadas */
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .animate-pop { animation: pop 0.25s ease-out; }
+        
+        @keyframes fall {
+            0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        .confetti { position: fixed; z-index: 9999; top: -10px; width: 10px; height: 10px; animation: fall 3s linear forwards; }
+        
+        @keyframes spin-dice {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .animate-spin-dice { animation: spin-dice 0.5s ease-out; }
+
+        /* Respetar preferencias de movimiento reducido */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300 min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-indigo-50 dark:from-slate-950 dark:to-slate-900">
+
+    <!-- Navbar (Glassmorphism) -->
+    <nav class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 py-3">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <h1 class="text-2xl md:text-3xl font-black tracking-tight bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent shrink-0">
+                Misión SIMCE
+            </h1>
+            
+            <div class="flex items-center overflow-hidden w-full md:w-auto">
+                <div class="flex overflow-x-auto flex-nowrap gap-2 w-full pb-2 md:pb-0 hide-scroll" role="tablist" aria-label="Secciones de la clase" id="tab-buttons">
+                    
+                    <button role="tab" aria-selected="true" data-target="sec-termometro" class="tab-btn active px-4 py-2 rounded-xl font-semibold bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 border-b-4 border-indigo-600 transition-all duration-200 whitespace-nowrap flex items-center gap-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-400/60">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/><path d="M12 7v5"/></svg>
+                        Termómetro
+                    </button>
+                    
+                    <button role="tab" aria-selected="false" data-target="sec-mitos" class="tab-btn px-4 py-2 rounded-xl font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 border-b-4 border-transparent transition-all duration-200 whitespace-nowrap flex items-center gap-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-400/60 text-slate-600 dark:text-slate-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
+                        Mitos
+                    </button>
+                    
+                    <button role="tab" aria-selected="false" data-target="sec-checklist" class="tab-btn px-4 py-2 rounded-xl font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 border-b-4 border-transparent transition-all duration-200 whitespace-nowrap flex items-center gap-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-400/60 text-slate-600 dark:text-slate-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                        Checklist
+                    </button>
+                    
+                    <button role="tab" aria-selected="false" data-target="sec-desastre" class="tab-btn px-4 py-2 rounded-xl font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 border-b-4 border-transparent transition-all duration-200 whitespace-nowrap flex items-center gap-2 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-400/60 text-slate-600 dark:text-slate-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14 18 3-3-3-3"/><path d="M17 15H9a4 4 0 0 1-4-4V7"/><path d="M2 13h2"/><path d="M3 17h2"/><path d="M5 21h2"/></svg>
+                        Simulacro
+                    </button>
+                </div>
+                
+                <!-- Botón Modo Oscuro -->
+                <button id="theme-toggle" class="ml-4 shrink-0 w-10 h-10 grid place-items-center rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-400/60" title="Cambiar tema">
+                    <svg id="theme-icon-light" class="hidden" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                    <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-6xl mx-auto w-full p-4 md:p-8">
+
+        <!-- SECTION 1: Termómetro -->
+        <section id="sec-termometro" class="tab-content active" role="tabpanel" aria-labelledby="tab-termometro">
+            <div class="text-center mb-10 space-y-4">
+                <span class="inline-block rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-3 py-1 text-sm font-bold tracking-wide">Paso 1</span>
+                <h2 class="text-4xl md:text-6xl font-black tracking-tight">Termómetro de Ansiedad</h2>
+                <p class="text-lg md:text-2xl text-slate-600 dark:text-slate-400">Del 1 (Relajado) al 10 (Pánico total), ¿cómo nos sentimos hoy?</p>
+            </div>
+            
+            <div class="max-w-4xl mx-auto bg-white dark:bg-slate-900 p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+                <!-- Gráfico de distribución -->
+                <div class="h-32 mb-6 flex items-end gap-1 md:gap-2 px-2" id="chart-container">
+                    <!-- Barras generadas por JS -->
+                </div>
+
+                <!-- Grilla de botones -->
+                <div class="grid grid-cols-5 md:grid-cols-10 gap-2 md:gap-4 mb-4" id="termometro-grid">
+                    <!-- Generado por JS -->
+                </div>
+                
+                <!-- Barra de gradiente y leyendas -->
+                <div class="flex items-center justify-between mt-6 px-2">
+                    <span class="text-sm md:text-base font-semibold text-emerald-600 dark:text-emerald-400">1 · Relajado</span>
+                    <div class="flex-grow mx-4 h-3 rounded-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 opacity-80"></div>
+                    <span class="text-sm md:text-base font-semibold text-rose-600 dark:text-rose-400">10 · Pánico total</span>
+                </div>
+            </div>
+            
+            <div class="mt-10 flex flex-col md:flex-row items-center justify-center gap-6">
+                <p class="text-xl md:text-2xl font-semibold bg-white dark:bg-slate-900 px-6 py-3 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">Total de votos: <span id="total-votos" class="text-indigo-600 dark:text-indigo-400 font-black">0</span></p>
+                <button id="reset-termometro" class="px-6 py-3 border border-slate-300 dark:border-slate-700 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 rounded-xl font-bold text-slate-700 dark:text-slate-300 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-400/60">Reiniciar Votos</button>
+            </div>
+        </section>
+
+        <!-- SECTION 2: Mitos y Realidades -->
+        <section id="sec-mitos" class="tab-content" role="tabpanel">
+            <div class="text-center mb-10 space-y-4">
+                <span class="inline-block rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-3 py-1 text-sm font-bold tracking-wide">Paso 2</span>
+                <h2 class="text-4xl md:text-6xl font-black tracking-tight">Mitos y Realidades</h2>
+                <p class="text-lg md:text-2xl text-slate-600 dark:text-slate-400">Despejemos dudas. ¿Qué es verdad y qué es puro invento?</p>
+            </div>
+
+            <div class="space-y-6 max-w-4xl mx-auto">
+                <!-- Tarjetas generadas dinámicamente o fijas. Usaremos HTML fijo para facilidad de lectura -->
+                
+                <!-- Ítem 1 -->
+                <div class="mito-card bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center gap-6 transition-all duration-300">
+                    <span class="text-5xl md:text-6xl font-black text-indigo-100 dark:text-slate-800 shrink-0">1</span>
+                    <p class="text-xl md:text-2xl font-semibold leading-snug flex-1">"Si me va mal, me baja el NEM o las notas del colegio."</p>
+                    <div class="w-44 h-16 shrink-0 relative">
+                        <button class="reveal-btn absolute inset-0 w-full h-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xl transition-all duration-300 shadow-md hover:shadow-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-400/60 z-10" data-tipo="mito">Revelar</button>
+                        <div class="result absolute inset-0 w-full h-full flex items-center justify-center gap-2 rounded-xl font-black text-xl uppercase tracking-wider opacity-0 scale-95 transition-all duration-300 z-0 bg-rose-100 text-rose-700 border-2 border-rose-500 dark:bg-rose-950/50 dark:text-rose-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                            MITO
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ítem 2 -->
+                <div class="mito-card bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center gap-6 transition-all duration-300">
+                    <span class="text-5xl md:text-6xl font-black text-indigo-100 dark:text-slate-800 shrink-0">2</span>
+                    <p class="text-xl md:text-2xl font-semibold leading-snug flex-1">"Dormir bien hoy es más útil que intentar estudiar a última hora."</p>
+                    <div class="w-44 h-16 shrink-0 relative">
+                        <button class="reveal-btn absolute inset-0 w-full h-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xl transition-all duration-300 shadow-md hover:shadow-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-400/60 z-10" data-tipo="realidad">Revelar</button>
+                        <div class="result absolute inset-0 w-full h-full flex items-center justify-center gap-2 rounded-xl font-black text-xl uppercase tracking-wider opacity-0 scale-95 transition-all duration-300 z-0 bg-emerald-100 text-emerald-700 border-2 border-emerald-500 dark:bg-emerald-950/50 dark:text-emerald-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                            REALIDAD
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ítem 3 -->
+                <div class="mito-card bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center gap-6 transition-all duration-300">
+                    <span class="text-5xl md:text-6xl font-black text-indigo-100 dark:text-slate-800 shrink-0">3</span>
+                    <p class="text-xl md:text-2xl font-semibold leading-snug flex-1">"Las preguntas de alternativa que no me sé me descuentan puntaje."</p>
+                    <div class="w-44 h-16 shrink-0 relative">
+                        <button class="reveal-btn absolute inset-0 w-full h-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xl transition-all duration-300 shadow-md hover:shadow-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-400/60 z-10" data-tipo="mito">Revelar</button>
+                        <div class="result absolute inset-0 w-full h-full flex items-center justify-center gap-2 rounded-xl font-black text-xl uppercase tracking-wider opacity-0 scale-95 transition-all duration-300 z-0 bg-rose-100 text-rose-700 border-2 border-rose-500 dark:bg-rose-950/50 dark:text-rose-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                            MITO
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ítem 4 -->
+                <div class="mito-card bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center gap-6 transition-all duration-300">
+                    <span class="text-5xl md:text-6xl font-black text-indigo-100 dark:text-slate-800 shrink-0">4</span>
+                    <p class="text-xl md:text-2xl font-semibold leading-snug flex-1">"Tengo que contestar la prueba rapidísimo y salir corriendo."</p>
+                    <div class="w-44 h-16 shrink-0 relative">
+                        <button class="reveal-btn absolute inset-0 w-full h-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xl transition-all duration-300 shadow-md hover:shadow-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-400/60 z-10" data-tipo="mito">Revelar</button>
+                        <div class="result absolute inset-0 w-full h-full flex items-center justify-center gap-2 rounded-xl font-black text-xl uppercase tracking-wider opacity-0 scale-95 transition-all duration-300 z-0 bg-rose-100 text-rose-700 border-2 border-rose-500 dark:bg-rose-950/50 dark:text-rose-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                            MITO
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ítem 5 -->
+                <div class="mito-card bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center gap-6 transition-all duration-300">
+                    <span class="text-5xl md:text-6xl font-black text-indigo-100 dark:text-slate-800 shrink-0">5</span>
+                    <p class="text-xl md:text-2xl font-semibold leading-snug flex-1">"El liceo usa estos resultados para ver en qué estamos fallando y mejorar."</p>
+                    <div class="w-44 h-16 shrink-0 relative">
+                        <button class="reveal-btn absolute inset-0 w-full h-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xl transition-all duration-300 shadow-md hover:shadow-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-400/60 z-10" data-tipo="realidad">Revelar</button>
+                        <div class="result absolute inset-0 w-full h-full flex items-center justify-center gap-2 rounded-xl font-black text-xl uppercase tracking-wider opacity-0 scale-95 transition-all duration-300 z-0 bg-emerald-100 text-emerald-700 border-2 border-emerald-500 dark:bg-emerald-950/50 dark:text-emerald-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                            REALIDAD
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-10 text-center">
+                <button id="reset-mitos" class="px-6 py-3 border border-slate-300 dark:border-slate-700 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 rounded-xl font-bold text-slate-700 dark:text-slate-300 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-400/60">Ocultar Todo</button>
+            </div>
+        </section>
+
+        <!-- SECTION 3: Checklist -->
+        <section id="sec-checklist" class="tab-content" role="tabpanel">
+            <div class="text-center mb-10 space-y-4">
+                <span class="inline-block rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-3 py-1 text-sm font-bold tracking-wide">Paso 3</span>
+                <h2 class="text-4xl md:text-6xl font-black tracking-tight">Checklist de Supervivencia</h2>
+                <p class="text-lg md:text-2xl text-slate-600 dark:text-slate-400">Marquemos lo que ya tenemos dominado para mañana.</p>
+            </div>
+
+            <div class="max-w-3xl mx-auto bg-white dark:bg-slate-900 p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+                
+                <!-- Barra de Progreso -->
+                <div class="mb-8">
+                    <div class="flex justify-between items-end mb-2">
+                        <span class="font-bold text-slate-500 uppercase tracking-wide text-sm">Progreso</span>
+                        <span id="progreso-texto" class="font-black text-indigo-600 dark:text-indigo-400 text-xl">0 de 5</span>
+                    </div>
+                    <div class="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                        <div id="progreso-barra" class="h-full bg-indigo-600 transition-all duration-500 w-0 rounded-full"></div>
+                    </div>
+                </div>
+
+                <div class="space-y-4" id="checklist-container">
+                    
+                    <!-- Items -->
+                    <label class="check-wrapper block relative">
+                        <input type="checkbox" class="survival-check peer sr-only">
+                        <div class="flex items-center gap-4 p-4 rounded-xl cursor-pointer transition-all duration-300 border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 peer-focus-visible:ring-4 peer-focus-visible:ring-indigo-400/60 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/20 peer-checked:border-emerald-200 dark:peer-checked:border-emerald-800 peer-checked:opacity-75">
+                            <!-- Custom Checkbox -->
+                            <div class="w-8 h-8 rounded-lg border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center transition-colors duration-200 peer-checked:bg-emerald-500 peer-checked:border-emerald-500 shrink-0">
+                                <svg class="w-5 h-5 text-white opacity-0 transition-opacity duration-200 check-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                            </div>
+                            <div class="text-xl md:text-2xl font-semibold transition-all duration-300 check-text">Cédula de Identidad (Carnet) o TNE en la mochila.</div>
+                        </div>
+                    </label>
+
+                    <label class="check-wrapper block relative">
+                        <input type="checkbox" class="survival-check peer sr-only">
+                        <div class="flex items-center gap-4 p-4 rounded-xl cursor-pointer transition-all duration-300 border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 peer-focus-visible:ring-4 peer-focus-visible:ring-indigo-400/60 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/20 peer-checked:border-emerald-200 dark:peer-checked:border-emerald-800 peer-checked:opacity-75">
+                            <div class="w-8 h-8 rounded-lg border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center transition-colors duration-200 peer-checked:bg-emerald-500 peer-checked:border-emerald-500 shrink-0">
+                                <svg class="w-5 h-5 text-white opacity-0 transition-opacity duration-200 check-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                            </div>
+                            <div class="text-xl md:text-2xl font-semibold transition-all duration-300 check-text">Lápiz grafito N°2 y goma de borrar (¡que borre bien!).</div>
+                        </div>
+                    </label>
+
+                    <label class="check-wrapper block relative">
+                        <input type="checkbox" class="survival-check peer sr-only">
+                        <div class="flex items-center gap-4 p-4 rounded-xl cursor-pointer transition-all duration-300 border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 peer-focus-visible:ring-4 peer-focus-visible:ring-indigo-400/60 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/20 peer-checked:border-emerald-200 dark:peer-checked:border-emerald-800 peer-checked:opacity-75">
+                            <div class="w-8 h-8 rounded-lg border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center transition-colors duration-200 peer-checked:bg-emerald-500 peer-checked:border-emerald-500 shrink-0">
+                                <svg class="w-5 h-5 text-white opacity-0 transition-opacity duration-200 check-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                            </div>
+                            <div class="text-xl md:text-2xl font-semibold transition-all duration-300 check-text">Tomar un buen desayuno (nada raro o muy pesado).</div>
+                        </div>
+                    </label>
+
+                    <label class="check-wrapper block relative">
+                        <input type="checkbox" class="survival-check peer sr-only">
+                        <div class="flex items-center gap-4 p-4 rounded-xl cursor-pointer transition-all duration-300 border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 peer-focus-visible:ring-4 peer-focus-visible:ring-indigo-400/60 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/20 peer-checked:border-emerald-200 dark:peer-checked:border-emerald-800 peer-checked:opacity-75">
+                            <div class="w-8 h-8 rounded-lg border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center transition-colors duration-200 peer-checked:bg-emerald-500 peer-checked:border-emerald-500 shrink-0">
+                                <svg class="w-5 h-5 text-white opacity-0 transition-opacity duration-200 check-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                            </div>
+                            <div class="text-xl md:text-2xl font-semibold transition-all duration-300 check-text">Llegar a la hora al liceo.</div>
+                        </div>
+                    </label>
+
+                    <label class="check-wrapper block relative">
+                        <input type="checkbox" class="survival-check peer sr-only">
+                        <div class="flex items-center gap-4 p-4 rounded-xl cursor-pointer transition-all duration-300 border border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 peer-focus-visible:ring-4 peer-focus-visible:ring-indigo-400/60 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/20 peer-checked:border-emerald-200 dark:peer-checked:border-emerald-800 peer-checked:opacity-75">
+                            <div class="w-8 h-8 rounded-lg border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center transition-colors duration-200 peer-checked:bg-emerald-500 peer-checked:border-emerald-500 shrink-0">
+                                <svg class="w-5 h-5 text-white opacity-0 transition-opacity duration-200 check-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                            </div>
+                            <div class="text-xl md:text-2xl font-semibold transition-all duration-300 check-text">Dormir al menos 8 horas esta noche.</div>
+                        </div>
+                    </label>
+
+                </div>
+
+                <!-- Mensaje de éxito -->
+                <div id="success-message" class="hidden mt-8 p-6 bg-gradient-to-r from-emerald-400 to-teal-500 text-white rounded-2xl shadow-xl text-center transition-all duration-500 scale-95 opacity-0">
+                    <h3 class="text-4xl font-extrabold mb-2">🎉 ¡Estamos Listos! 🎉</h3>
+                    <p class="text-xl font-medium">Con esto dominado, sobrevivir al SIMCE está garantizado.</p>
+                </div>
+            </div>
+            
+            <div class="mt-8 text-center">
+                 <button id="reset-checklist" class="px-6 py-3 border border-slate-300 dark:border-slate-700 bg-white hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 rounded-xl font-bold text-slate-700 dark:text-slate-300 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-400/60">Desmarcar todo</button>
+            </div>
+        </section>
+
+        <!-- SECTION 4: Simulacro de Desastre -->
+        <section id="sec-desastre" class="tab-content" role="tabpanel">
+            <div class="text-center mb-10 space-y-4">
+                <span class="inline-block rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-3 py-1 text-sm font-bold tracking-wide">Paso 4</span>
+                <h2 class="text-4xl md:text-6xl font-black tracking-tight">Simulacro del Desastre</h2>
+                <p class="text-lg md:text-2xl text-slate-600 dark:text-slate-400">¿Qué es lo peor (y más ridículo) que podría pasar mañana?</p>
+            </div>
+
+            <div class="max-w-4xl mx-auto flex flex-col items-center">
+                
+                <button id="btn-generar" class="px-8 py-5 md:px-10 md:py-6 bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white rounded-2xl font-black text-2xl md:text-3xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-200 active:translate-y-0 active:shadow-md w-full md:w-auto flex items-center justify-center gap-4 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-pink-400/60">
+                    <svg id="dice-icon" xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M16 8h.01"/><path d="M8 8h.01"/><path d="M16 16h.01"/><path d="M8 16h.01"/><path d="M12 12h.01"/></svg>
+                    <span id="btn-generar-texto">Generar Escenario Absurdo</span>
+                </button>
+
+                <div id="escenario-display" class="mt-12 p-8 md:p-12 w-full min-h-[300px] flex flex-col justify-center bg-white dark:bg-slate-900 rounded-2xl shadow-sm border-2 border-dashed border-purple-300 dark:border-purple-800/50 text-center transition-all duration-500 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-slate-900 dark:to-slate-900">
+                    
+                    <div id="escenario-placeholder" class="text-xl md:text-2xl text-slate-400 dark:text-slate-600 font-semibold italic">
+                        Presiona el botón para conocer tu destino...
+                    </div>
+
+                    <div id="escenario-content" class="hidden space-y-8">
+                        <div>
+                            <span class="block text-xs font-black tracking-widest text-slate-400 uppercase mb-2">Quién</span>
+                            <p id="texto-sujeto" class="text-3xl md:text-4xl font-bold text-purple-600 dark:text-purple-400"></p>
+                        </div>
+                        <div>
+                            <span class="block text-xs font-black tracking-widest text-slate-400 uppercase mb-2">Qué Hace</span>
+                            <p id="texto-accion" class="text-3xl md:text-4xl font-bold text-pink-600 dark:text-pink-400"></p>
+                        </div>
+                        <div>
+                            <span class="block text-xs font-black tracking-widest text-slate-400 uppercase mb-2">Consecuencia</span>
+                            <p id="texto-desenlace" class="text-3xl md:text-4xl font-bold text-indigo-600 dark:text-indigo-400"></p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="py-6 text-center text-sm font-semibold text-slate-400 dark:text-slate-600 mt-auto">
+        II° E · Orientación · SIMCE
+    </footer>
+
+    <!-- CSS custom en línea adicional para checkbox styling y utilidades -->
+    <style>
+        .survival-check:checked ~ div .check-icon {
+            opacity: 1;
+        }
+        .survival-check:checked ~ div .check-text {
+            text-decoration: line-through;
+            color: #94a3b8; /* slate-400 */
+        }
+        .dark .survival-check:checked ~ div .check-text {
+            color: #64748b; /* slate-500 */
+        }
+        /* Ocultar barra de scroll en contenedores móviles pero permitir scroll */
+        .hide-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+
+    <script>
+        // --- NAVEGACIÓN POR PESTAÑAS (Accesible) ---
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Quitar estados activos
+                tabBtns.forEach(b => {
+                    b.classList.remove('active', 'bg-indigo-100', 'text-indigo-700', 'dark:bg-indigo-900/50', 'dark:text-indigo-300', 'border-indigo-600');
+                    b.classList.add('hover:bg-slate-100', 'dark:hover:bg-slate-800', 'border-transparent', 'text-slate-600', 'dark:text-slate-400');
+                    b.setAttribute('aria-selected', 'false');
+                });
+                tabContents.forEach(c => c.classList.remove('active'));
+
+                // Activar actual
+                btn.classList.add('active', 'bg-indigo-100', 'text-indigo-700', 'dark:bg-indigo-900/50', 'dark:text-indigo-300', 'border-indigo-600');
+                btn.classList.remove('hover:bg-slate-100', 'dark:hover:bg-slate-800', 'border-transparent', 'text-slate-600', 'dark:text-slate-400');
+                btn.setAttribute('aria-selected', 'true');
+                
+                const target = document.getElementById(btn.getAttribute('data-target'));
+                target.classList.add('active');
+            });
+            
+            // Soporte teclado
+            btn.addEventListener('keydown', (e) => {
+                if(e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    btn.click();
+                }
+            });
+        });
+
+        // --- MODO OSCURO ---
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        const iconLight = document.getElementById('theme-icon-light');
+        const iconDark = document.getElementById('theme-icon-dark');
+
+        function updateThemeIcons() {
+            if (html.classList.contains('dark')) {
+                iconLight.classList.remove('hidden');
+                iconDark.classList.add('hidden');
+            } else {
+                iconLight.classList.add('hidden');
+                iconDark.classList.remove('hidden');
+            }
+        }
+
+        // Revisar preferencia previa
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        }
+        updateThemeIcons();
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
+            updateThemeIcons();
+        });
+
+        // --- LÓGICA TERMÓMETRO ---
+        const termometroGrid = document.getElementById('termometro-grid');
+        const chartContainer = document.getElementById('chart-container');
+        const totalVotosEl = document.getElementById('total-votos');
+        let votos = Array(10).fill(0);
+        let totalVotos = 0;
+
+        function renderTermometro() {
+            termometroGrid.innerHTML = '';
+            chartContainer.innerHTML = '';
+            
+            let maxVotos = Math.max(...votos, 1); // Evitar división por 0
+
+            for (let i = 1; i <= 10; i++) {
+                // Colores Semáforo
+                let baseColor = "emerald";
+                if(i >= 4 && i <= 7) baseColor = "amber";
+                if(i >= 8) baseColor = "rose";
+
+                // 1. Crear Botón
+                const btn = document.createElement('button');
+                btn.className = `flex flex-col items-center justify-center aspect-square rounded-2xl border transition-all duration-200 hover:-translate-y-1 hover:shadow-lg focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-${baseColor}-400/60 bg-${baseColor}-50 text-${baseColor}-700 border-${baseColor}-200 dark:bg-${baseColor}-900/20 dark:text-${baseColor}-300 dark:border-${baseColor}-800/50 hover:bg-${baseColor}-100 dark:hover:bg-${baseColor}-900/40`;
+                
+                const spanNum = document.createElement('span');
+                spanNum.className = 'text-3xl md:text-5xl font-black mb-1';
+                spanNum.innerText = i;
+                
+                const badge = document.createElement('div');
+                badge.className = 'flex items-center justify-center min-w-[2.5rem] h-8 rounded-full bg-white dark:bg-slate-900 shadow-sm text-sm font-bold border border-slate-200 dark:border-slate-700';
+                badge.innerText = votos[i-1];
+
+                btn.appendChild(spanNum);
+                btn.appendChild(badge);
+
+                btn.onclick = () => {
+                    votos[i-1]++;
+                    totalVotos++;
+                    totalVotosEl.innerText = totalVotos;
+                    
+                    // Animar la insignia
+                    badge.classList.remove('animate-pop');
+                    void badge.offsetWidth; // trigger reflow
+                    badge.classList.add('animate-pop');
+                    
+                    actualizarGrafico();
+                    badge.innerText = votos[i-1];
+                };
+                termometroGrid.appendChild(btn);
+
+                // 2. Crear Barra de Gráfico
+                const bar = document.createElement('div');
+                bar.id = `bar-${i}`;
+                bar.className = `flex-1 rounded-t-md transition-all duration-500 bg-${baseColor}-400 dark:bg-${baseColor}-500/80`;
+                bar.style.height = '0%';
+                chartContainer.appendChild(bar);
+            }
+            actualizarGrafico();
+            totalVotosEl.innerText = totalVotos;
+        }
+
+        function actualizarGrafico() {
+            let maxVotos = Math.max(...votos, 1);
+            for (let i = 1; i <= 10; i++) {
+                const bar = document.getElementById(`bar-${i}`);
+                if(bar) {
+                    const heightPercent = (votos[i-1] / maxVotos) * 100;
+                    bar.style.height = `${heightPercent}%`;
+                }
+            }
+        }
+        
+        document.getElementById('reset-termometro').addEventListener('click', () => {
+            votos = Array(10).fill(0);
+            totalVotos = 0;
+            renderTermometro();
+        });
+        
+        // Inicializar Termómetro
+        renderTermometro();
+
+        // --- LÓGICA MITOS Y REALIDADES ---
+        const revealBtns = document.querySelectorAll('.reveal-btn');
+        revealBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const resultDiv = this.nextElementSibling;
+                const card = this.closest('.mito-card');
+                const tipo = this.getAttribute('data-tipo');
+                
+                // Ocultar botón, mostrar resultado
+                this.classList.add('opacity-0', 'pointer-events-none');
+                resultDiv.classList.remove('opacity-0', 'scale-95', 'z-0');
+                resultDiv.classList.add('opacity-100', 'scale-100', 'z-20');
+                
+                // Cambiar estilo de la tarjeta entera
+                if(tipo === 'realidad') {
+                    card.classList.remove('border-slate-200', 'dark:border-slate-800');
+                    card.classList.add('border-emerald-400', 'bg-emerald-50/50', 'dark:bg-emerald-900/10', 'dark:border-emerald-800/50');
+                } else {
+                    card.classList.remove('border-slate-200', 'dark:border-slate-800');
+                    card.classList.add('border-rose-400', 'bg-rose-50/50', 'dark:bg-rose-900/10', 'dark:border-rose-800/50');
+                }
+            });
+        });
+
+        document.getElementById('reset-mitos').addEventListener('click', () => {
+            document.querySelectorAll('.reveal-btn').forEach(btn => {
+                const resultDiv = btn.nextElementSibling;
+                const card = btn.closest('.mito-card');
+                
+                btn.classList.remove('opacity-0', 'pointer-events-none');
+                resultDiv.classList.remove('opacity-100', 'scale-100', 'z-20');
+                resultDiv.classList.add('opacity-0', 'scale-95', 'z-0');
+                
+                card.classList.remove('border-emerald-400', 'bg-emerald-50/50', 'dark:bg-emerald-900/10', 'dark:border-emerald-800/50', 'border-rose-400', 'bg-rose-50/50', 'dark:bg-rose-900/10', 'dark:border-rose-800/50');
+                card.classList.add('border-slate-200', 'dark:border-slate-800');
+            });
+        });
+
+        // --- LÓGICA CHECKLIST ---
+        const checks = document.querySelectorAll('.survival-check');
+        const successMsg = document.getElementById('success-message');
+        const barraProgreso = document.getElementById('progreso-barra');
+        const textoProgreso = document.getElementById('progreso-texto');
+        const totalChecks = checks.length;
+
+        function crearConfeti() {
+            const colores = ['#4f46e5', '#ec4899', '#10b981', '#f59e0b', '#06b6d4'];
+            for(let i=0; i<30; i++) {
+                const conf = document.createElement('div');
+                conf.className = 'confetti rounded-sm';
+                conf.style.left = Math.random() * 100 + 'vw';
+                conf.style.backgroundColor = colores[Math.floor(Math.random() * colores.length)];
+                conf.style.animationDelay = Math.random() * 0.5 + 's';
+                document.body.appendChild(conf);
+                
+                // Limpiar del DOM
+                setTimeout(() => conf.remove(), 3500);
+            }
+        }
+
+        function checkAllStatus() {
+            let marcados = 0;
+            checks.forEach(c => {
+                if (c.checked) marcados++;
+            });
+            
+            // Actualizar barra y texto
+            textoProgreso.innerText = `${marcados} de ${totalChecks}`;
+            barraProgreso.style.width = `${(marcados / totalChecks) * 100}%`;
+
+            if (marcados === totalChecks) {
+                successMsg.classList.remove('hidden');
+                // Timeout para permitir la transición CSS
+                setTimeout(() => {
+                    successMsg.classList.remove('scale-95', 'opacity-0');
+                    successMsg.classList.add('scale-100', 'opacity-100');
+                    crearConfeti();
+                }, 10);
+            } else {
+                successMsg.classList.remove('scale-100', 'opacity-100');
+                successMsg.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => successMsg.classList.add('hidden'), 500);
+            }
+        }
+
+        checks.forEach(check => {
+            check.addEventListener('change', checkAllStatus);
+        });
+
+        document.getElementById('reset-checklist').addEventListener('click', () => {
+            checks.forEach(c => c.checked = false);
+            checkAllStatus();
+        });
+
+        // --- LÓGICA SIMULACRO DE DESASTRE ---
+        const sujetos = [
+            "El profe de Matemáticas", 
+            "El inspector general", 
+            "Una gaviota mutante", 
+            "Un alien despistado", 
+            "Un NPC de Minecraft",
+            "El director"
+        ];
+        
+        const acciones = [
+            "se roba todas las gomas de borrar del colegio", 
+            "corta la luz de toda la comuna sin querer", 
+            "empieza a bailar cueca en el pasillo central", 
+            "reparte las pruebas escritas en chino mandarín",
+            "activa la alarma de incendios con la mente",
+            "derrama una bebida sobre todas las hojas de respuesta"
+        ];
+
+        const desenlaces = [
+            "y tenemos que salvar el día resolviendo el SIMCE con una regla.", 
+            "y el SIMCE se suspende para siempre (o eso creemos).", 
+            "y terminamos jugando bachillerato toda la mañana.",
+            "y nos ponen puros sietes a todos por los daños morales.",
+            "y tenemos que hacer la prueba dictada a puros gritos."
+        ];
+
+        const btnGenerar = document.getElementById('btn-generar');
+        const iconDado = document.getElementById('dice-icon');
+        const displayDiv = document.getElementById('escenario-display');
+        const placeholder = document.getElementById('escenario-placeholder');
+        const content = document.getElementById('escenario-content');
+        
+        const textSujeto = document.getElementById('texto-sujeto');
+        const textAccion = document.getElementById('texto-accion');
+        const textDesenlace = document.getElementById('texto-desenlace');
+        const btnGenerarTexto = document.getElementById('btn-generar-texto');
+
+        btnGenerar.addEventListener('click', () => {
+            // Animar el dado
+            iconDado.classList.remove('animate-spin-dice');
+            void iconDado.offsetWidth; // Reflow
+            iconDado.classList.add('animate-spin-dice');
+            
+            btnGenerarTexto.innerText = "Otro Escenario";
+
+            const s = sujetos[Math.floor(Math.random() * sujetos.length)];
+            const a = acciones[Math.floor(Math.random() * acciones.length)];
+            const d = desenlaces[Math.floor(Math.random() * desenlaces.length)];
+
+            // Ocultar transitoriamente el contenedor para efecto
+            displayDiv.classList.add('opacity-0', 'scale-95');
+            
+            setTimeout(() => {
+                // Quitar placeholder si existe
+                if(!placeholder.classList.contains('hidden')) {
+                    placeholder.classList.add('hidden');
+                    content.classList.remove('hidden');
+                }
+                
+                textSujeto.innerText = s;
+                textAccion.innerText = a;
+                textDesenlace.innerText = d;
+                
+                displayDiv.classList.remove('opacity-0', 'scale-95');
+            }, 300); // Mitad de la animación
+        });
+
+    </script>
+</body>
+</html>
